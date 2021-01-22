@@ -89,6 +89,7 @@ class Scheduler(object):
         in one hour increments then your job won't be run 60 times in
         between but only once.
         """
+        print('in sched run pending')
         runnable_jobs = (job for job in self.jobs if job.should_run)
         for job in sorted(runnable_jobs):
             await self._run_job(job)
@@ -595,6 +596,7 @@ async def run_pending():
     """Calls :meth:`run_pending <Scheduler.run_pending>` on the
     :data:`default scheduler instance <default_scheduler>`.
     """
+    print('in package run pending')
     await default_scheduler.run_pending()
 
 
