@@ -92,7 +92,9 @@ class Scheduler(object):
         print('in sched run pending')
         runnable_jobs = (job for job in self.jobs if job.should_run)
         for job in sorted(runnable_jobs):
+            print('looping')
             await self._run_job(job)
+            print('finished awaiting')
 
     async def run_all(self, delay_seconds=0):
         """
