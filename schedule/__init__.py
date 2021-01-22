@@ -499,6 +499,7 @@ class Job(object):
         print('in the run')
         logger.debug('Running job %s', self)
         if self.is_async:
+            print('gonna await job_func')
             ret = await self.job_func()
         else:
             ret = self.job_func()
