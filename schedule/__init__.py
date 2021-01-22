@@ -480,7 +480,7 @@ class Job(object):
         functools.update_wrapper(self.job_func, job_func)
         self._schedule_next_run()
         self.scheduler.jobs.append(self)
-        print('IN THE DO', self.job_func)
+        print('IN THE DO', self.job_func, args)
         return self
 
     @property
