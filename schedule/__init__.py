@@ -79,7 +79,7 @@ class Scheduler(object):
     def __init__(self):
         self.jobs = []
 
-    def run_pending(self):
+    async def run_pending(self):
         """
         Run all jobs that are scheduled to run.
 
@@ -91,10 +91,9 @@ class Scheduler(object):
         """
         runnable_jobs = (job for job in self.jobs if job.should_run)
         for job in sorted(runnable_jobs):
-            self._run_job(job)
-            print('edited!')
+            await self._run_job(job)
 
-    def run_all(self, delay_seconds=0):
+    async def run_all(self, delay_seconds=0):
         """
         Run all jobs regardless if they are scheduled to run or not.
 
@@ -107,7 +106,7 @@ class Scheduler(object):
         logger.debug('Running *all* %i jobs with %is delay inbetween',
                      len(self.jobs), delay_seconds)
         for job in self.jobs[:]:
-            self._run_job(job)
+            await self._run_job(job)
             time.sleep(delay_seconds)
 
     def clear(self, tag=None):
@@ -134,18 +133,18 @@ class Scheduler(object):
         except ValueError:
             pass
 
-    def every(self, interval=1):
+    def every(self, interval=1, is_async=False):
         """
         Schedule a new periodic job.
 
         :param interval: A quantity of a certain time unit
         :return: An unconfigured :class:`Job <Job>`
         """
-        job = Job(interval, self)
+        job = Job(interval, self, is_async=is_async)
         return job
 
-    def _run_job(self, job):
-        ret = job.run()
+    async def _run_job(self, job):
+        ret = await job.run()
         if isinstance(ret, CancelJob) or ret is CancelJob:
             self.cancel_job(job)
 
@@ -190,7 +189,7 @@ class Job(object):
     A job is usually created and returned by :meth:`Scheduler.every`
     method, which also defines its `interval`.
     """
-    def __init__(self, interval, scheduler=None):
+    def __init__(self, interval, scheduler=None, is_async=False):
         self.interval = interval  # pause interval * unit between runs
         self.latest = None  # upper limit to the interval
         self.job_func = None  # the job job_func to run
@@ -202,6 +201,7 @@ class Job(object):
         self.start_day = None  # Specific day of the week to start on
         self.tags = set()  # unique set of tags for the job
         self.scheduler = scheduler  # scheduler to register with
+        self.is_async = is_async # if this is an async job
 
     def __lt__(self, other):
         """
@@ -212,12 +212,14 @@ class Job(object):
 
     def __str__(self):
         return (
-            "Job(interval={}, "
+            "Job(is_async={}, "
+            "interval={}, "
             "unit={}, "
             "do={}, "
             "args={}, "
             "kwargs={})"
-        ).format(self.interval,
+        ).format(self.is_async,
+                 self.interval,
                  self.unit,
                  self.job_func.__name__,
                  self.job_func.args,
@@ -458,7 +460,7 @@ class Job(object):
         self.latest = latest
         return self
 
-    def do(self, job_func, *args, **kwargs):
+    def do(self, job_func, is_async=False, *args, **kwargs):
         """
         Specifies the job_func that should be called every time the
         job runs.
@@ -482,14 +484,17 @@ class Job(object):
         """
         return datetime.datetime.now() >= self.next_run
 
-    def run(self):
+    async def run(self):
         """
         Run the job and immediately reschedule it.
 
         :return: The return value returned by the `job_func`
         """
         logger.debug('Running job %s', self)
-        ret = self.job_func()
+        if self.is_async:
+            ret = await self.job_func()
+        else:
+            ret = self.job_func()
         self.last_run = datetime.datetime.now()
         self._schedule_next_run()
         return ret
