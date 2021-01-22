@@ -496,6 +496,7 @@ class Job(object):
 
         :return: The return value returned by the `job_func`
         """
+        print('in the run')
         logger.debug('Running job %s', self)
         if self.is_async:
             ret = await self.job_func()
