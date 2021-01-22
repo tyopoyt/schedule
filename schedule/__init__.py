@@ -591,18 +591,18 @@ def every(interval=1, is_async=False):
     return default_scheduler.every(interval, is_async)
 
 
-def run_pending():
+async def run_pending():
     """Calls :meth:`run_pending <Scheduler.run_pending>` on the
     :data:`default scheduler instance <default_scheduler>`.
     """
-    default_scheduler.run_pending()
+    await default_scheduler.run_pending()
 
 
-def run_all(delay_seconds=0):
+async def run_all(delay_seconds=0):
     """Calls :meth:`run_all <Scheduler.run_all>` on the
     :data:`default scheduler instance <default_scheduler>`.
     """
-    default_scheduler.run_all(delay_seconds=delay_seconds)
+    await default_scheduler.run_all(delay_seconds=delay_seconds)
 
 
 def clear(tag=None):
