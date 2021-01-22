@@ -500,9 +500,12 @@ class Job(object):
         logger.debug('Running job %s', self)
         if self.is_async:
             print('gonna await job_func')
-            for thing in job_func:
-                print(thing)
-            ret = await self.job_func()
+            try:
+                for thing in job_func:
+                    print(thing)
+                ret = await self.job_func()
+            except e:
+                print(e)
         else:
             ret = self.job_func()
         self.last_run = datetime.datetime.now()
