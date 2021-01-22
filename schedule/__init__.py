@@ -472,7 +472,7 @@ class Job(object):
         :param job_func: The function to be scheduled
         :return: The invoked job instance
         """
-        print(*args)
+        print('IN THE DO')
         self.job_func = functools.partial(job_func, *args, **kwargs)
         functools.update_wrapper(self.job_func, job_func)
         self._schedule_next_run()
