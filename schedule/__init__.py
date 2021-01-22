@@ -584,11 +584,11 @@ default_scheduler = Scheduler()
 jobs = default_scheduler.jobs  # todo: should this be a copy, e.g. jobs()?
 
 
-def every(interval=1):
+def every(interval=1, is_async=False):
     """Calls :meth:`every <Scheduler.every>` on the
     :data:`default scheduler instance <default_scheduler>`.
     """
-    return default_scheduler.every(interval)
+    return default_scheduler.every(interval, is_async)
 
 
 def run_pending():
