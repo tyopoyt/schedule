@@ -501,7 +501,7 @@ class Job(object):
         if self.is_async:
             print('gonna await job_func', self.job_func.func, self.job_func.args, self.job_func.keywords)
             try:
-                ret = await self.job_func()
+                ret = await self.job_func.func()
             except e:
                 print(e)
         else:
