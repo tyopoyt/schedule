@@ -147,6 +147,7 @@ class Scheduler(object):
         return job
 
     async def _run_job(self, job):
+        print('in _run_job')
         ret = await job.run()
         if isinstance(ret, CancelJob) or ret is CancelJob:
             self.cancel_job(job)
