@@ -92,6 +92,7 @@ class Scheduler(object):
         runnable_jobs = (job for job in self.jobs if job.should_run)
         for job in sorted(runnable_jobs):
             self._run_job(job)
+            print('edited!')
 
     def run_all(self, delay_seconds=0):
         """
